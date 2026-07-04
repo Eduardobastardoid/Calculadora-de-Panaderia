@@ -1,0 +1,3355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculadora Panadera</title>
+    
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- React & ReactDOM v18 -->
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel Standalone for JSX compilation in browser -->
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.20/babel.min.js" crossorigin></script>
+
+    <!-- Custom Premium Styles (Vanilla CSS) -->
+    <style type="text/css">
+        :root {
+            --bg-color: #fbf9f6;
+            --text-color: #2e201b;
+            --text-muted: #6b5a54;
+            --primary: #d46338;
+            --primary-hover: #b84e27;
+            --primary-light: #fcf0e8;
+            --secondary: #8a3f24;
+            --accent: #e8a863;
+            --border: #ebdcd3;
+            --border-focus: #d46338;
+            --card-bg: #ffffff;
+            --success: #3c7a5a;
+            --success-light: #eef7f2;
+            --danger: #b53828;
+            --danger-light: #fdf2f0;
+            --warning: #cc8400;
+            --warning-light: #fff8e6;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 24px;
+            --shadow-sm: 0 4px 6px -1px rgba(46, 32, 27, 0.05), 0 2px 4px -1px rgba(46, 32, 27, 0.03);
+            --shadow-md: 0 10px 15px -3px rgba(46, 32, 27, 0.08), 0 4px 6px -2px rgba(46, 32, 27, 0.04);
+            --shadow-lg: 0 20px 25px -5px rgba(46, 32, 27, 0.12), 0 10px 10px -5px rgba(46, 32, 27, 0.06);
+            --font-sans: 'Outfit', sans-serif;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Layout Structure */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Permanent Header */
+        .permanent-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .header-logo svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary);
+        }
+
+        .header-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            color: var(--text-color);
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Menu Button */
+        .menu-trigger {
+            background: var(--primary-light);
+            border: none;
+            color: var(--primary);
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-trigger:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Main Content wrapper */
+        .main-wrapper {
+            flex: 1;
+            padding: 24px;
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Sliding Drawer Sidebar */
+        .sidebar-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100%;
+            background: var(--card-bg);
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+        }
+
+        .sidebar-drawer.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(46, 32, 27, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 90;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-backdrop.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .sidebar-close:hover {
+            background: var(--bg-color);
+            color: var(--danger);
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sidebar-link:hover {
+            color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .sidebar-link.active {
+            color: white;
+            background-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(212, 99, 56, 0.3);
+        }
+
+        .sidebar-link svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar-footer {
+            padding: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background-color: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid rgba(181, 56, 40, 0.1);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background-color: var(--danger);
+            color: white;
+            box-shadow: 0 4px 10px rgba(181, 56, 40, 0.2);
+        }
+
+        /* Glassmorphic Panel Card */
+        .glass-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            margin-bottom: 24px;
+        }
+
+        .glass-panel:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Headings & Text */
+        .view-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .view-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        /* Grid systems */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        /* Dashboard specific */
+        .dashboard-hero {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            color: white;
+            border-radius: var(--radius-lg);
+            padding: 36px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 28px;
+            border: none;
+        }
+
+        .dashboard-hero::after {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(232, 168, 99, 0.25) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-welcome {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-desc {
+            max-width: 600px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .action-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .action-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .action-card:hover .action-icon {
+            background-color: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .action-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .action-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Suggestions of season */
+        .suggestions-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .suggestions-badge {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .recipe-grid-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+
+        .recipe-grid-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .recipe-card-img-placeholder {
+            height: 140px;
+            background: linear-gradient(135deg, #f3e9e5 0%, #ebd9cf 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            position: relative;
+        }
+
+        .recipe-card-season-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--card-bg);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .recipe-card-season-badge.invierno {
+            color: #0b66a3;
+            background: #eef7fc;
+        }
+
+        .recipe-card-season-badge.verano {
+            color: #b35900;
+            background: #fff6ed;
+        }
+
+        .recipe-card-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .recipe-card-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .recipe-card-info {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .btn-recipe-action {
+            margin-top: auto;
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border);
+            color: var(--text-color);
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-recipe-action:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Buttons styling */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(212, 99, 56, 0.15);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(212, 99, 56, 0.25);
+        }
+
+        .btn-secondary {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border-color: var(--border);
+            color: var(--text-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--bg-color);
+            border-color: var(--text-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #9d2e20;
+        }
+
+        .btn-block {
+            display: flex;
+            width: 100%;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Form elements */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            font-family: var(--font-sans);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background-color: #ffffff;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            width: 100%;
+            transition: var(--transition);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(212, 99, 56, 0.15);
+        }
+
+        /* Checkbox styling */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            height: 22px;
+            width: 22px;
+            background-color: #eee;
+            border-radius: var(--radius-sm);
+            display: inline-block;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .checkbox-container:hover input ~ .checkmark {
+            background-color: #ccc;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: var(--primary);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .checkbox-container .checkmark:after {
+            left: 8px;
+            top: 4px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Alert/Status Blocks */
+        .alert-block {
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+            border: 1px solid transparent;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .alert-block svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .alert-warning {
+            background-color: var(--warning-light);
+            color: #8c5b00;
+            border-color: rgba(204, 132, 0, 0.15);
+        }
+
+        .alert-danger {
+            background-color: var(--danger-light);
+            color: #90281b;
+            border-color: rgba(181, 56, 40, 0.15);
+        }
+
+        .alert-info {
+            background-color: var(--primary-light);
+            color: var(--primary-hover);
+            border-color: rgba(212, 99, 56, 0.15);
+        }
+
+        /* Table styles */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: var(--bg-color);
+            padding: 12px 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: var(--primary-light);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(46, 32, 27, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalFadeIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Utility classes */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-success { background-color: var(--success-light); color: var(--success); }
+        .badge-danger { background-color: var(--danger-light); color: var(--danger); }
+        .badge-warning { background-color: var(--warning-light); color: var(--warning); }
+        .badge-primary { background-color: var(--primary-light); color: var(--primary); }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: 700; }
+        .mt-4 { margin-top: 16px; }
+        .mb-4 { margin-bottom: 16px; }
+
+        /* Detail table block inside Calculator */
+        .detail-table-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .detail-table-header {
+            background-color: var(--primary-light);
+            padding: 10px 16px;
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-table-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            background: white;
+        }
+
+        .detail-table-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-table-row.total-row {
+            background-color: var(--bg-color);
+            font-weight: 800;
+            border-top: 2px solid var(--border);
+        }
+
+        /* Responsive utilities */
+        @media (max-width: 768px) {
+            .permanent-header {
+                padding: 10px 16px;
+            }
+            .main-wrapper {
+                padding: 16px;
+            }
+            .view-title {
+                font-size: 1.5rem;
+            }
+            .dashboard-hero {
+                padding: 24px;
+            }
+            .hero-welcome {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // ==========================================
+        // INITIAL DEMO DATA
+        // ==========================================
+        const INITIAL_INSUMOS = [
+            { id: 'i1', nombre: 'Harina de Trigo Especial', unidad: 'Kg', precioRef: 1200 },
+            { id: 'i2', nombre: 'Agua Fría', unidad: 'Ltr', precioRef: 100 },
+            { id: 'i3', nombre: 'Levadura Fresca', unidad: 'Gr', precioRef: 4 },
+            { id: 'i4', nombre: 'Sal Fina', unidad: 'Gr', precioRef: 2 },
+            { id: 'i5', nombre: 'Azúcar Rubia', unidad: 'Gr', precioRef: 3 },
+            { id: 'i6', nombre: 'Pannivita Premezcla', unidad: 'Gr', precioRef: 8 },
+            { id: 'i7', nombre: 'Manteca Vegetal', unidad: 'Gr', precioRef: 6 },
+            { id: 'i8', nombre: 'Mejorador de Masa', unidad: 'Gr', precioRef: 10 }
+        ];
+
+        const INITIAL_BATIDOS_BASE = [
+            { id: 'b1', nombre: 'Batido Pan Francés', totalMasaTeorica: 25000, temporada: 'verano', esActiva: true },
+            { id: 'b2', nombre: 'Batido Pan de Molde', totalMasaTeorica: 15000, temporada: 'verano', esActiva: true },
+            { id: 'b3', nombre: 'Batido Bollería Invierno', totalMasaTeorica: 18000, temporada: 'invierno', esActiva: true }
+        ];
+
+        const INITIAL_RECETAS = [
+            {
+                id: 'r1',
+                nombre: 'Chico (Marraqueta)',
+                foto: '',
+                notes: '',
+                notas: 'Masa tradicional crujiente. Fermentar 2 horas.',
+                temporada: 'verano',
+                esActiva: true,
+                batidoBaseId: 'b1',
+                pesoUnidad: 65,
+                unidadesPorBandeja: 32,
+                bandejasPorCarro: 18,
+                tipoPorcentaje: 'panadero',
+                porcentajes: {
+                    'i1': { fabricante: 100, panadero: 100, estandar: 100 }, // Harina
+                    'i2': { fabricante: 60, panadero: 58, estandar: 60 },   // Agua
+                    'i3': { fabricante: 3, panadero: 3.5, estandar: 3 },    // Levadura
+                    'i4': { fabricante: 2, panadero: 2, estandar: 2 },      // Sal
+                    'i8': { fabricante: 1, panadero: 1.2, estandar: 1 }     // Mejorador
+                }
+            },
+            {
+                id: 'r2',
+                nombre: 'Jumbo (Pan Coposo)',
+                foto: '',
+                notes: '',
+                notas: 'Excelente volumen. Hornear a 200°C.',
+                temporada: 'verano',
+                esActiva: true,
+                batidoBaseId: 'b1',
+                pesoUnidad: 130,
+                unidadesPorBandeja: 16,
+                bandejasPorCarro: 18,
+                tipoPorcentaje: 'estandar',
+                porcentajes: {
+                    'i1': { fabricante: 100, panadero: 100, estandar: 100 }, // Harina
+                    'i2': { fabricante: 60, panadero: 60, estandar: 60 },   // Agua
+                    'i3': { fabricante: 3, panadero: 3, estandar: 3 },      // Levadura
+                    'i4': { fabricante: 2, panadero: 1.8, estandar: 2 },    // Sal
+                    'i6': { fabricante: 5, panadero: 5, estandar: 5 },      // Pannivita
+                    'i8': { fabricante: 1, panadero: 1, estandar: 1 }       // Mejorador
+                }
+            },
+            {
+                id: 'r3',
+                nombre: 'Pan de Molde Familiar',
+                foto: '',
+                notes: '',
+                notas: 'Masa suave con manteca. Molde grande.',
+                temporada: 'verano',
+                esActiva: true,
+                batidoBaseId: 'b2',
+                pesoUnidad: 400,
+                unidadesPorBandeja: 10,
+                bandejasPorCarro: 12,
+                tipoPorcentaje: 'fabricante',
+                porcentajes: {
+                    'i1': { fabricante: 100, panadero: 100, estandar: 100 },
+                    'i2': { fabricante: 55, panadero: 55, estandar: 55 },
+                    'i3': { fabricante: 2.5, panadero: 3, estandar: 2.5 },
+                    'i4': { fabricante: 1.8, panadero: 1.8, estandar: 1.8 },
+                    'i5': { fabricante: 6, panadero: 6, estandar: 6 },
+                    'i7': { fabricante: 5, panadero: 5, estandar: 5 }
+                }
+            }
+        ];
+
+        // Detección automática de temporada según el mes actual (América Latina: Invierno de Mayo a Septiembre)
+        const getTemporadaActual = () => {
+            const mesIndex = new Date().getMonth(); // 0-11
+            return (mesIndex >= 4 && mesIndex <= 8) ? 'invierno' : 'verano';
+        };
+
+        // Helper para comprobar si un ingrediente es líquido
+        const esInsumoLiquido = (nombre, unidad) => {
+            const n = nombre.toLowerCase();
+            return n.includes('agua') || n.includes('leche') || n.includes('jugo') || n.includes('liquido') || n.includes('líquido') || unidad === 'Ltr';
+        };
+
+        // ==========================================
+        // MAIN COMPONENT
+        // ==========================================
+        function App() {
+            // Local Storage Persistence Hooks
+            const [empresa, setEmpresa] = useState(() => {
+                const saved = localStorage.getItem('panaderia_empresa');
+                return saved ? JSON.parse(saved) : { nombre: 'Maestro Panadero', logo: '' };
+            });
+
+            const [insumos, setInsumos] = useState(() => {
+                const saved = localStorage.getItem('panaderia_insumos');
+                return saved ? JSON.parse(saved) : INITIAL_INSUMOS;
+            });
+
+            const [batidosBase, setBatidosBase] = useState(() => {
+                const saved = localStorage.getItem('panaderia_batidos_base');
+                return saved ? JSON.parse(saved) : INITIAL_BATIDOS_BASE;
+            });
+
+            const [recetas, setRecetas] = useState(() => {
+                const saved = localStorage.getItem('panaderia_recetas');
+                return saved ? JSON.parse(saved) : INITIAL_RECETAS;
+            });
+
+            const [historial, setHistorial] = useState(() => {
+                const saved = localStorage.getItem('panaderia_historial');
+                return saved ? JSON.parse(saved) : [];
+            });
+
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [drawerOpen, setDrawerOpen] = useState(false);
+
+            // Pre-fill parameters for calculator or registrations
+            const [calculatorPreset, setCalculatorPreset] = useState(null);
+            const [registrarBatidoPreset, setRegistrarBatidoPreset] = useState(null);
+
+            // Double confirmation for total restart
+            const [showRestartModal, setShowRestartModal] = useState(false);
+            const [restartConfirmText, setRestartConfirmText] = useState('');
+
+            // Sync with local storage
+            useEffect(() => {
+                localStorage.setItem('panaderia_empresa', JSON.stringify(empresa));
+            }, [empresa]);
+
+            useEffect(() => {
+                localStorage.setItem('panaderia_insumos', JSON.stringify(insumos));
+            }, [insumos]);
+
+            useEffect(() => {
+                localStorage.setItem('panaderia_batidos_base', JSON.stringify(batidosBase));
+            }, [batidosBase]);
+
+            useEffect(() => {
+                localStorage.setItem('panaderia_recetas', JSON.stringify(recetas));
+            }, [recetas]);
+
+            useEffect(() => {
+                localStorage.setItem('panaderia_historial', JSON.stringify(historial));
+            }, [historial]);
+
+            // Clean database total restart
+            const handleTotalRestart = () => {
+                if (restartConfirmText.trim().toLowerCase() === 'reiniciar') {
+                    localStorage.clear();
+                    setEmpresa({ nombre: 'Maestro Panadero', logo: '' });
+                    setInsumos(INITIAL_INSUMOS);
+                    setBatidosBase(INITIAL_BATIDOS_BASE);
+                    setRecetas(INITIAL_RECETAS);
+                    setHistorial([]);
+                    setRestartConfirmText('');
+                    setShowRestartModal(false);
+                    setActiveTab('dashboard');
+                    alert('Base de datos reiniciada a valores iniciales de fábrica.');
+                } else {
+                    alert('Por favor, escriba "reiniciar" correctamente.');
+                }
+            };
+
+            const temporadaActual = useMemo(() => getTemporadaActual(), []);
+
+            return (
+                <div class="app-container">
+                    {/* Header */}
+                    <header class="permanent-header">
+                        <div class="header-brand">
+                            <div class="header-logo">
+                                {empresa.logo ? (
+                                    <img src={empresa.logo} alt="Logo" />
+                                ) : (
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 3v18M3 12h18M6 6l12 12M6 18L18 6" stroke-linecap="round" />
+                                    </svg>
+                                )}
+                            </div>
+                            <span class="header-title">{empresa.nombre}</span>
+                        </div>
+                        <div class="header-actions">
+                            <button class="menu-trigger" onClick={() => setDrawerOpen(true)}>
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <line x1="3" y1="12" x2="21" y2="12" stroke-linecap="round"/>
+                                    <line x1="3" y1="6" x2="21" y2="6" stroke-linecap="round"/>
+                                    <line x1="3" y1="18" x2="21" y2="18" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </header>
+
+                    {/* Sidebar Drawer */}
+                    <div class={`sidebar-backdrop ${drawerOpen ? 'visible' : ''}`} onClick={() => setDrawerOpen(false)} />
+                    <aside class={`sidebar-drawer ${drawerOpen ? 'open' : ''}`}>
+                        <div class="sidebar-header">
+                            <div class="header-brand">
+                                <span class="font-bold uppercase tracking-wider text-sm">Navegación</span>
+                            </div>
+                            <button class="sidebar-close" onClick={() => setDrawerOpen(false)}>
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/>
+                                    <line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <nav class="sidebar-menu">
+                            <button class={`sidebar-link ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); setDrawerOpen(false); }}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+                                Inicio
+                            </button>
+                            <button class={`sidebar-link ${activeTab === 'calculadora' ? 'active' : ''}`} onClick={() => { setActiveTab('calculadora'); setDrawerOpen(false); }}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="12" y1="9" x2="12" y2="15"/></svg>
+                                Calculadora
+                            </button>
+                            <button class={`sidebar-link ${activeTab === 'insumos' ? 'active' : ''}`} onClick={() => { setActiveTab('insumos'); setDrawerOpen(false); }}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                                Gestión de Insumos
+                            </button>
+                            <button class={`sidebar-link ${activeTab === 'batidos' ? 'active' : ''}`} onClick={() => { setActiveTab('batidos'); setDrawerOpen(false); }}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                Batidos Base
+                            </button>
+                            <button class={`sidebar-link ${activeTab === 'recetas' ? 'active' : ''}`} onClick={() => { setActiveTab('recetas'); setDrawerOpen(false); }}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                Módulo de Recetas
+                            </button>
+                            <button class={`sidebar-link ${activeTab === 'historial' ? 'active' : ''}`} onClick={() => { setActiveTab('historial'); setDrawerOpen(false); }}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Historial de Batidos
+                            </button>
+                            <button class={`sidebar-link ${activeTab === 'instrucciones' ? 'active' : ''}`} onClick={() => { setActiveTab('instrucciones'); setDrawerOpen(false); }}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                Instrucciones y Glosario
+                            </button>
+                            <button class={`sidebar-link ${activeTab === 'configuracion' ? 'active' : ''}`} onClick={() => { setActiveTab('configuracion'); setDrawerOpen(false); }}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                                Configuración
+                            </button>
+                        </nav>
+                        <div class="sidebar-footer">
+                            <button class="btn-logout" onClick={() => { setDrawerOpen(false); }}>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                                Cerrar Menú
+                            </button>
+                        </div>
+                    </aside>
+
+                    {/* Main content view rendering */}
+                    <main class="main-wrapper">
+                        {activeTab === 'dashboard' && (
+                            <DashboardView 
+                                recetas={recetas}
+                                temporadaActual={temporadaActual}
+                                navigateTo={(tab, preset) => {
+                                    if (tab === 'calculadora' && preset) {
+                                        setCalculatorPreset(preset);
+                                    }
+                                    if (tab === 'registrar_batido' && preset) {
+                                        setRegistrarBatidoPreset(preset);
+                                    }
+                                    setActiveTab(tab);
+                                }}
+                                onTriggerRestart={() => setShowRestartModal(true)}
+                            />
+                        )}
+
+                        {activeTab === 'calculadora' && (
+                            <CalculadoraView 
+                                recetas={recetas}
+                                insumos={insumos}
+                                batidosBase={batidosBase}
+                                preset={calculatorPreset}
+                                clearPreset={() => setCalculatorPreset(null)}
+                                onSendToRegister={(data) => {
+                                    setRegistrarBatidoPreset(data);
+                                    setActiveTab('registrar_batido');
+                                }}
+                            />
+                        )}
+
+                        {activeTab === 'registrar_batido' && (
+                            <RegistrarBatidoView 
+                                batidosBase={batidosBase}
+                                recetas={recetas}
+                                insumos={insumos}
+                                preset={registrarBatidoPreset}
+                                clearPreset={() => setRegistrarBatidoPreset(null)}
+                                onSave={(newRecord) => {
+                                    setHistorial(prev => [newRecord, ...prev]);
+                                    setActiveTab('historial');
+                                }}
+                            />
+                        )}
+
+                        {activeTab === 'insumos' && (
+                            <InsumosView 
+                                insumos={insumos}
+                                setInsumos={setInsumos}
+                            />
+                        )}
+
+                        {activeTab === 'batidos' && (
+                            <BatidosView 
+                                batidosBase={batidosBase}
+                                setBatidosBase={setBatidosBase}
+                            />
+                        )}
+
+                        {activeTab === 'recetas' && (
+                            <RecetasView 
+                                recetas={recetas}
+                                setRecetas={setRecetas}
+                                insumos={insumos}
+                                batidosBase={batidosBase}
+                            />
+                        )}
+
+                        {activeTab === 'historial' && (
+                            <HistorialView 
+                                historial={historial}
+                                setHistorial={setHistorial}
+                            />
+                        )}
+
+                        {activeTab === 'instrucciones' && (
+                            <InstruccionesView />
+                        )}
+
+                        {activeTab === 'configuracion' && (
+                            <ConfiguracionView 
+                                empresa={empresa}
+                                setEmpresa={setEmpresa}
+                            />
+                        )}
+                    </main>
+
+                    {/* Double Confirmation Restart Modal */}
+                    {showRestartModal && (
+                        <div class="modal-overlay">
+                            <div class="modal-container">
+                                <div class="modal-header">
+                                    <h3 class="font-bold text-danger">⚠️ Reinicio Total del Sistema</h3>
+                                    <button class="sidebar-close" onClick={() => setShowRestartModal(false)}>✕</button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="mb-4 font-bold">Esta acción **borrará permanentemente** todas las recetas, insumos, batidos base y el historial acumulado en la base de datos de esta aplicación.</p>
+                                    <p class="mb-4 text-danger">Esta acción no se puede deshacer y dejará la aplicación limpia para nuevos negocios.</p>
+                                    <div class="form-group">
+                                        <label>Para confirmar, escribe la palabra **reiniciar** abajo:</label>
+                                        <input 
+                                            type="text" 
+                                            value={restartConfirmText} 
+                                            onChange={(e) => setRestartConfirmText(e.target.value)} 
+                                            placeholder="Escribe 'reiniciar'"
+                                            style={{ borderColor: 'var(--danger)' }}
+                                        />
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-outline" onClick={() => setShowRestartModal(false)}>Cancelar</button>
+                                    <button class="btn btn-danger" onClick={handleTotalRestart} disabled={restartConfirmText.trim().toLowerCase() !== 'reiniciar'}>Confirmar Reinicio</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 1. DASHBOARD / INICIO VIEW
+        // ==========================================
+        function DashboardView({ recetas, temporadaActual, navigateTo, onTriggerRestart }) {
+            const recetasSugeridas = useMemo(() => {
+                return recetas.filter(r => r.esActiva && r.temporada === temporadaActual);
+            }, [recetas, temporadaActual]);
+
+            return (
+                <div>
+                    <div class="dashboard-hero">
+                        <h1 class="hero-welcome">¡Buen día, Maestro!</h1>
+                        <p class="hero-desc">Administra, escala y calcula las recetas de tu panadería usando el método versátil de Porcentaje Panadero.</p>
+                    </div>
+
+                    <div class="dashboard-actions">
+                        <div class="action-card" onClick={() => navigateTo('calculadora')}>
+                            <div class="action-icon">
+                                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                                    <line x1="9" y1="9" x2="15" y2="9"/>
+                                    <line x1="9" y1="13" x2="15" y2="13"/>
+                                    <line x1="12" y1="9" x2="12" y2="15"/>
+                                </svg>
+                            </div>
+                            <h3>Nueva Calculadora</h3>
+                            <p>Escala fórmulas por ingredientes, bandejas o unidades.</p>
+                        </div>
+                        <div class="action-card" onClick={() => navigateTo('registrar_batido')}>
+                            <div class="action-icon">
+                                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <h3>Registrar Batido</h3>
+                            <p>Registra pesos reales obtenidos y calcula la merma.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel">
+                        <h2 class="suggestions-title">
+                            🌾 Recetas Sugeridas para esta Temporada
+                            <span class="suggestions-badge">{temporadaActual}</span>
+                        </h2>
+
+                        {recetasSugeridas.length === 0 ? (
+                            <p class="text-muted text-center py-6">No hay recetas activas catalogadas para esta temporada ({temporadaActual}).</p>
+                        ) : (
+                            <div class="grid-3">
+                                {recetasSugeridas.map(receta => (
+                                    <div key={receta.id} class="recipe-grid-card">
+                                        <div class="recipe-card-img-placeholder">
+                                            {receta.foto ? (
+                                                <img src={receta.foto} alt={receta.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <span>🍞 Sin Imagen</span>
+                                            )}
+                                            <span class={`recipe-card-season-badge ${receta.temporada}`}>
+                                                {receta.temporada}
+                                            </span>
+                                        </div>
+                                        <div class="recipe-card-body">
+                                            <h4 class="recipe-card-title">{receta.nombre}</h4>
+                                            <p class="recipe-card-info">Rendimiento: {receta.pesoUnidad}g • {receta.unidadesPorBandeja} U/Band</p>
+                                            <button 
+                                                class="btn-recipe-action" 
+                                                onClick={() => navigateTo('calculadora', receta.id)}
+                                            >
+                                                Usar Calculadora
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div class="text-center mt-4 mb-4" style={{ paddingTop: '20px', borderTop: '1px solid var(--border)' }}>
+                        <button class="btn btn-outline btn-sm text-muted" onClick={onTriggerRestart}>
+                            🔄 Reinicio Total de la Base de Datos
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 2. GESTIÓN DE INSUMOS VIEW
+        // ==========================================
+        function InsumosView({ insumos, setInsumos }) {
+            const [nombre, setNombre] = useState('');
+            const [unidad, setUnidad] = useState('Gr');
+            const [precioRef, setPrecioRef] = useState('');
+            const [editingId, setEditingId] = useState(null);
+
+            const resetForm = () => {
+                setNombre('');
+                setUnidad('Gr');
+                setPrecioRef('');
+                setEditingId(null);
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (!nombre.trim()) {
+                    alert('El nombre del insumo es obligatorio.');
+                    return;
+                }
+
+                const duplicado = insumos.some(ins => 
+                    ins.id !== editingId && ins.nombre.toLowerCase().trim() === nombre.toLowerCase().trim()
+                );
+                if (duplicado) {
+                    alert('Ya existe un insumo registrado con este nombre.');
+                    return;
+                }
+
+                const precio = parseFloat(precioRef) || 0;
+
+                if (editingId) {
+                    setInsumos(prev => prev.map(ins => 
+                        ins.id === editingId ? { ...ins, nombre: nombre.trim(), unidad, precioRef: precio } : ins
+                    ));
+                    alert('Insumo actualizado con éxito.');
+                } else {
+                    const newInsumo = {
+                        id: 'i_' + Date.now(),
+                        nombre: nombre.trim(),
+                        unidad,
+                        precioRef: precio
+                    };
+                    setInsumos(prev => [...prev, newInsumo]);
+                    alert('Insumo agregado con éxito.');
+                }
+                resetForm();
+            };
+
+            const handleEdit = (insumo) => {
+                setNombre(insumo.nombre);
+                setUnidad(insumo.unidad);
+                setPrecioRef(insumo.precioRef.toString());
+                setEditingId(insumo.id);
+            };
+
+            const handleDelete = (id, nombreInsumo) => {
+                if (window.confirm(`¿Estás seguro de que deseas eliminar el insumo "${nombreInsumo}"?`)) {
+                    setInsumos(prev => prev.filter(ins => ins.id !== id));
+                }
+            };
+
+            return (
+                <div>
+                    <h2 class="view-title">Gestión de Insumos</h2>
+                    <p class="view-subtitle">Crea y edita los ingredientes que formarán parte de tus recetas.</p>
+
+                    <div class="grid-2">
+                        {/* Form Card */}
+                        <div class="glass-panel">
+                            <h3 class="mb-4 font-bold">{editingId ? 'Editar Insumo' : 'Añadir Insumo'}</h3>
+                            <form onSubmit={handleSubmit}>
+                                <div class="form-group">
+                                    <label>Nombre del Insumo</label>
+                                    <input 
+                                        type="text" 
+                                        value={nombre} 
+                                        onChange={(e) => setNombre(e.target.value)} 
+                                        placeholder="Ej. Harina de Centeno, Azúcar Blanca"
+                                    />
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Unidad de Medida</label>
+                                        <select value={unidad} onChange={(e) => setUnidad(e.target.value)}>
+                                            <option value="Gr">Gr (Gramos)</option>
+                                            <option value="Kg">Kg (Kilogramos)</option>
+                                            <option value="Ltr">Ltr (Litros)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Precio Ref. ($)</label>
+                                        <input 
+                                            type="number" 
+                                            value={precioRef} 
+                                            onChange={(e) => setPrecioRef(e.target.value)} 
+                                            placeholder="Ej. 1200"
+                                            min="0"
+                                            step="0.01"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="form-row mt-4">
+                                    <button type="submit" class="btn btn-primary">{editingId ? 'Actualizar' : 'Guardar'}</button>
+                                    {editingId && <button type="button" class="btn btn-outline" onClick={resetForm}>Cancelar</button>}
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* List Card */}
+                        <div class="glass-panel">
+                            <h3 class="mb-4 font-bold">Listado de Insumos ({insumos.length})</h3>
+                            {insumos.length === 0 ? (
+                                <p class="text-muted text-center py-6">No hay insumos registrados.</p>
+                            ) : (
+                                <div class="table-responsive" style={{ maxHeight: '400px' }}>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Unidad</th>
+                                                <th>Precio Ref.</th>
+                                                <th class="text-right">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {insumos.map(ins => (
+                                                <tr key={ins.id}>
+                                                    <td class="font-bold">{ins.nombre}</td>
+                                                    <td><span class="badge badge-primary">{ins.unidad}</span></td>
+                                                    <td>${ins.precioRef || 0}</td>
+                                                    <td class="text-right">
+                                                        <button class="btn btn-secondary btn-sm" onClick={() => handleEdit(ins)} style={{ marginRight: '6px' }}>Editar</button>
+                                                        <button class="btn btn-danger btn-sm" onClick={() => handleDelete(ins.id, ins.nombre)}>Eliminar</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 3. GESTIÓN DE BATIDOS BASE VIEW
+        // ==========================================
+        function BatidosView({ batidosBase, setBatidosBase }) {
+            const [nombre, setNombre] = useState('');
+            const [totalMasaTeorica, setTotalMasaTeorica] = useState('');
+            const [temporada, setTemporada] = useState('verano');
+            const [esActiva, setEsActiva] = useState(true);
+            const [editingId, setEditingId] = useState(null);
+
+            const resetForm = () => {
+                setNombre('');
+                setTotalMasaTeorica('');
+                setTemporada('verano');
+                setEsActiva(true);
+                setEditingId(null);
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (!nombre.trim()) {
+                    alert('El nombre del batido base es obligatorio.');
+                    return;
+                }
+                const masa = parseFloat(totalMasaTeorica) || 0;
+                if (masa <= 0) {
+                    alert('La masa teórica total debe ser mayor a 0.');
+                    return;
+                }
+
+                const duplicado = batidosBase.some(b => 
+                    b.id !== editingId && b.nombre.toLowerCase().trim() === nombre.toLowerCase().trim()
+                );
+                if (duplicado) {
+                    alert('Ya existe un batido base registrado con este nombre.');
+                    return;
+                }
+
+                if (editingId) {
+                    setBatidosBase(prev => prev.map(b => 
+                        b.id === editingId ? { ...b, nombre: nombre.trim(), totalMasaTeorica: masa, temporada, esActiva } : b
+                    ));
+                    alert('Batido base actualizado con éxito.');
+                } else {
+                    const newBatido = {
+                        id: 'b_' + Date.now(),
+                        nombre: nombre.trim(),
+                        totalMasaTeorica: masa,
+                        temporada,
+                        esActiva
+                    };
+                    setBatidosBase(prev => [...prev, newBatido]);
+                    alert('Batido base guardado con éxito.');
+                }
+                resetForm();
+            };
+
+            const handleEdit = (batido) => {
+                setNombre(batido.nombre);
+                setTotalMasaTeorica(batido.totalMasaTeorica.toString());
+                setTemporada(batido.temporada);
+                setEsActiva(batido.esActiva);
+                setEditingId(batido.id);
+            };
+
+            const handleDelete = (id, nombreBatido, esActivaStatus) => {
+                if (esActivaStatus) {
+                    alert(`El batido base "${nombreBatido}" está en estado ACTIVA y no puede eliminarse por seguridad.`);
+                    return;
+                }
+                if (window.confirm(`¿Estás seguro de que deseas eliminar el batido base "${nombreBatido}"?`)) {
+                    setBatidosBase(prev => prev.filter(b => b.id !== id));
+                }
+            };
+
+            return (
+                <div>
+                    <h2 class="view-title">Gestión de Batidos Base</h2>
+                    <p class="view-subtitle">Define los tipos de batido base y sus masas de producción teóricas.</p>
+
+                    <div class="grid-2">
+                        {/* Form Card */}
+                        <div class="glass-panel">
+                            <h3 class="mb-4 font-bold">{editingId ? 'Editar Batido Base' : 'Añadir Batido Base'}</h3>
+                            <form onSubmit={handleSubmit}>
+                                <div class="form-group">
+                                    <label>Nombre del Batido</label>
+                                    <input 
+                                        type="text" 
+                                        value={nombre} 
+                                        onChange={(e) => setNombre(e.target.value)} 
+                                        placeholder="Ej. Batido de Pan Francés Standard"
+                                    />
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Masa Teórica Total (Gr)</label>
+                                        <input 
+                                            type="number" 
+                                            value={totalMasaTeorica} 
+                                            onChange={(e) => setTotalMasaTeorica(e.target.value)} 
+                                            placeholder="Ej. 25000"
+                                            min="1"
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Temporada</label>
+                                        <select value={temporada} onChange={(e) => setTemporada(e.target.value)}>
+                                            <option value="verano">Verano</option>
+                                            <option value="invierno">Invierno</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group mt-2">
+                                    <label class="checkbox-container">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={esActiva} 
+                                            onChange={(e) => setEsActiva(e.target.checked)}
+                                        />
+                                        <span class="checkmark"></span>
+                                        Estado Activa (Bloquea eliminación por seguridad)
+                                    </label>
+                                </div>
+                                <div class="form-row mt-4">
+                                    <button type="submit" class="btn btn-primary">{editingId ? 'Actualizar' : 'Guardar'}</button>
+                                    {editingId && <button type="button" class="btn btn-outline" onClick={resetForm}>Cancelar</button>}
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* List Card */}
+                        <div class="glass-panel">
+                            <h3 class="mb-4 font-bold">Batidos Base Registrados ({batidosBase.length})</h3>
+                            {batidosBase.length === 0 ? (
+                                <p class="text-muted text-center py-6">No hay batidos registrados.</p>
+                            ) : (
+                                <div class="table-responsive" style={{ maxHeight: '420px' }}>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Masa Teór.</th>
+                                                <th>Temp.</th>
+                                                <th>Estado</th>
+                                                <th class="text-right">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {batidosBase.map(b => (
+                                                <tr key={b.id}>
+                                                    <td class="font-bold">{b.nombre}</td>
+                                                    <td>{(b.totalMasaTeorica / 1000).toFixed(2)} Kg</td>
+                                                    <td>
+                                                        <span class={`badge ${b.temporada === 'verano' ? 'badge-warning' : 'badge-primary'}`}>
+                                                            {b.temporada}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class={`badge ${b.esActiva ? 'badge-success' : 'badge-danger'}`}>
+                                                            {b.esActiva ? 'Activa' : 'Inactiva'}
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <button class="btn btn-secondary btn-sm" onClick={() => handleEdit(b)} style={{ marginRight: '6px' }}>Editar</button>
+                                                        <button 
+                                                            class="btn btn-danger btn-sm" 
+                                                            onClick={() => handleDelete(b.id, b.nombre, b.esActiva)}
+                                                            disabled={b.esActiva}
+                                                            title={b.esActiva ? 'No se puede eliminar un batido base activo' : ''}
+                                                        >
+                                                            Eliminar
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 4. MÓDULO DE RECETAS VIEW
+        // ==========================================
+        function RecetasView({ recetas, setRecetas, insumos, batidosBase }) {
+            const [nombre, setNombre] = useState('');
+            const [foto, setFoto] = useState('');
+            const [notas, setNotas] = useState('');
+            const [temporada, setTemporada] = useState('verano');
+            const [esActiva, setEsActiva] = useState(true);
+            const [batidoBaseId, setBatidoBaseId] = useState('');
+            const [pesoUnidad, setPesoUnidad] = useState('');
+            const [unidadesPorBandeja, setUnidadesPorBandeja] = useState('');
+            const [bandejasPorCarro, setBandejasPorCarro] = useState('');
+            const [tipoPorcentaje, setTipoPorcentaje] = useState('panadero');
+
+            const [recipeIngs, setRecipeIngs] = useState({});
+            const [selectedInsumoId, setSelectedInsumoId] = useState('');
+            const [ingPctFabricante, setIngPctFabricante] = useState('');
+            const [ingPctPanadero, setIngPctPanadero] = useState('');
+            const [ingPctEstandar, setIngPctEstandar] = useState('');
+
+            const [editingId, setEditingId] = useState(null);
+
+            const resetForm = () => {
+                setNombre('');
+                setFoto('');
+                setNotas('');
+                setTemporada('verano');
+                setEsActiva(true);
+                setBatidoBaseId(batidosBase[0]?.id || '');
+                setPesoUnidad('');
+                setUnidadesPorBandeja('');
+                setBandejasPorCarro('');
+                setTipoPorcentaje('panadero');
+                setRecipeIngs({});
+                setSelectedInsumoId('');
+                setIngPctFabricante('');
+                setIngPctPanadero('');
+                setIngPctEstandar('');
+                setEditingId(null);
+            };
+
+            const handleImageChange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setFoto(reader.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const handleAddIngredient = () => {
+                if (!selectedInsumoId) {
+                    alert('Selecciona un ingrediente.');
+                    return;
+                }
+                const pFab = parseFloat(ingPctFabricante) || 0;
+                const pPan = parseFloat(ingPctPanadero) || 0;
+                const pEst = parseFloat(ingPctEstandar) || 0;
+
+                if (pFab <= 0 && pPan <= 0 && pEst <= 0) {
+                    alert('Debes ingresar al menos un porcentaje mayor a 0% en alguno de los tipos.');
+                    return;
+                }
+
+                setRecipeIngs(prev => ({
+                    ...prev,
+                    [selectedInsumoId]: {
+                        fabricante: pFab,
+                        panadero: pPan,
+                        estandar: pEst
+                    }
+                }));
+
+                setSelectedInsumoId('');
+                setIngPctFabricante('');
+                setIngPctPanadero('');
+                setIngPctEstandar('');
+            };
+
+            const handleRemoveIngredient = (id) => {
+                const ins = insumos.find(i => i.id === id);
+                if (ins && ins.nombre.toLowerCase().trim() === 'harina') {
+                    alert('No se puede eliminar la Harina ya que representa el ingrediente base (100%).');
+                    return;
+                }
+                setRecipeIngs(prev => {
+                    const copy = { ...prev };
+                    delete copy[id];
+                    return copy;
+                });
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+
+                if (!nombre.trim()) {
+                    alert('El nombre de la receta es obligatorio.');
+                    return;
+                }
+                if (!batidoBaseId) {
+                    alert('Debe asociar un batido base a la receta.');
+                    return;
+                }
+                const pesoU = parseFloat(pesoUnidad) || 0;
+                const uBandeja = parseInt(unidadesPorBandeja) || 0;
+                const bCarro = parseInt(bandejasPorCarro) || 0;
+
+                if (pesoU <= 0 || uBandeja <= 0 || bCarro <= 0) {
+                    alert('El peso unitario, unidades por bandeja y bandejas por carro deben ser mayores a 0.');
+                    return;
+                }
+
+                const duplicado = recetas.some(r => 
+                    r.id !== editingId && r.nombre.toLowerCase().trim() === nombre.toLowerCase().trim()
+                );
+                if (duplicado) {
+                    alert('Ya existe una receta registrada con este nombre.');
+                    return;
+                }
+
+                const keys = Object.keys(recipeIngs);
+                if (keys.length < 2) {
+                    alert('La receta debe contener al menos 2 ingredientes (la Harina y otro insumo).');
+                    return;
+                }
+
+                let hasFlour = false;
+                keys.forEach(k => {
+                    const ins = insumos.find(i => i.id === k);
+                    if (ins && ins.nombre.toLowerCase().includes('harina')) {
+                        const p = recipeIngs[k];
+                        if (p.fabricante === 100 || p.panadero === 100 || p.estandar === 100) {
+                            hasFlour = true;
+                        }
+                    }
+                });
+
+                if (!hasFlour) {
+                    alert('Debe añadir un ingrediente que contenga "Harina" en su nombre y tener fijado su porcentaje en 100% en cualquiera de los perfiles.');
+                    return;
+                }
+
+                const savedRecipe = {
+                    id: editingId ? editingId : 'r_' + Date.now(),
+                    nombre: nombre.trim(),
+                    foto,
+                    notas: notas.trim(),
+                    temporada,
+                    esActiva,
+                    batidoBaseId,
+                    pesoUnidad: pesoU,
+                    unidadesPorBandeja: uBandeja,
+                    bandejasPorCarro: bCarro,
+                    tipoPorcentaje,
+                    porcentajes: recipeIngs
+                };
+
+                if (editingId) {
+                    setRecetas(prev => prev.map(r => r.id === editingId ? savedRecipe : r));
+                    alert('Receta actualizada con éxito.');
+                } else {
+                    setRecetas(prev => [...prev, savedRecipe]);
+                    alert('Receta guardada con éxito.');
+                }
+
+                resetForm();
+            };
+
+            const handleEdit = (receta) => {
+                setNombre(receta.nombre);
+                setFoto(receta.foto || '');
+                setNotas(receta.notas || '');
+                setTemporada(receta.temporada);
+                setEsActiva(receta.esActiva);
+                setBatidoBaseId(receta.batidoBaseId);
+                setPesoUnidad(receta.pesoUnidad.toString());
+                setUnidadesPorBandeja(receta.unidadesPorBandeja.toString());
+                setBandejasPorCarro(receta.bandejasPorCarro.toString());
+                setTipoPorcentaje(receta.tipoPorcentaje);
+                setRecipeIngs({ ...receta.porcentajes });
+                setEditingId(receta.id);
+            };
+
+            const handleDelete = (id, nombreReceta, esActivaStatus) => {
+                if (esActivaStatus) {
+                    alert(`La receta "${nombreReceta}" está activa y no puede ser eliminada por motivos de seguridad.`);
+                    return;
+                }
+                if (window.confirm(`¿Estás seguro de que deseas eliminar la receta "${nombreReceta}"?`)) {
+                    setRecetas(prev => prev.filter(r => r.id !== id));
+                }
+            };
+
+            const getRendimientoCarro = (receta) => {
+                return receta.unidadesPorBandeja * receta.bandejasPorCarro;
+            };
+
+            return (
+                <div>
+                    <h2 class="view-title">Módulo de Recetas</h2>
+                    <p class="view-subtitle">Administra tus fórmulas y asocia rendimientos por bandejas, carros y temporadas.</p>
+
+                    <div class="grid-2">
+                        {/* Editor Card */}
+                        <div class="glass-panel" style={{ gridColumn: 'span 2' }}>
+                            <h3 class="mb-4 font-bold">{editingId ? `Editar Receta: ${nombre}` : 'Registrar Nueva Receta'}</h3>
+                            
+                            <form onSubmit={handleSubmit}>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Nombre de la Receta</label>
+                                        <input 
+                                            type="text" 
+                                            value={nombre} 
+                                            onChange={(e) => setNombre(e.target.value)} 
+                                            placeholder="Ej. Marraqueta Tradicional"
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Batido Base Vinculado</label>
+                                        <select value={batidoBaseId} onChange={(e) => setBatidoBaseId(e.target.value)}>
+                                            <option value="">-- Seleccionar Batido Base --</option>
+                                            {batidosBase.map(b => (
+                                                <option key={b.id} value={b.id}>{b.nombre} ({b.temporada})</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid-3">
+                                    <div class="form-group">
+                                        <label>Peso de Pan Unitario (g)</label>
+                                        <input 
+                                            type="number" 
+                                            value={pesoUnidad} 
+                                            onChange={(e) => setPesoUnidad(e.target.value)} 
+                                            placeholder="Ej. 65"
+                                            min="1"
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Unidades por Bandeja</label>
+                                        <input 
+                                            type="number" 
+                                            value={unidadesPorBandeja} 
+                                            onChange={(e) => setUnidadesPorBandeja(e.target.value)} 
+                                            placeholder="Ej. 32"
+                                            min="1"
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Bandejas por Carro</label>
+                                        <input 
+                                            type="number" 
+                                            value={bandejasPorCarro} 
+                                            onChange={(e) => setBandejasPorCarro(e.target.value)} 
+                                            placeholder="Ej. 18"
+                                            min="1"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Temporada</label>
+                                        <select value={temporada} onChange={(e) => setTemporada(e.target.value)}>
+                                            <option value="verano">Verano</option>
+                                            <option value="invierno">Invierno</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Porcentaje Preferido en Calculadora</label>
+                                        <select value={tipoPorcentaje} onChange={(e) => setTipoPorcentaje(e.target.value)}>
+                                            <option value="fabricante">Porcentaje Fabricante</option>
+                                            <option value="panadero">Porcentaje Panadero</option>
+                                            <option value="estandar">Porcentaje Estándar Empresa</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Imagen del Producto</label>
+                                        <input type="file" accept="image/*" onChange={handleImageChange} />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Notas de Preparación</label>
+                                    <textarea value={notas} onChange={(e) => setNotas(e.target.value)} placeholder="Ej. Tiempo de fermentación, temperatura del horno, tips..."></textarea>
+                                </div>
+
+                                {/* Ingredient Builder block */}
+                                <div class="detail-table-card mb-4">
+                                    <div class="detail-table-header">
+                                        <span>Insumo</span>
+                                        <span>% Fab / % Pan / % Est</span>
+                                        <span>Acción</span>
+                                    </div>
+                                    {Object.keys(recipeIngs).length === 0 ? (
+                                        <p class="text-muted text-center py-4 bg-white" style={{ fontSize: '0.85rem' }}>No se han añadido ingredientes a la fórmula aún.</p>
+                                    ) : (
+                                        Object.entries(recipeIngs).map(([id, pct]) => {
+                                            const ins = insumos.find(i => i.id === id);
+                                            const name = ins ? ins.nombre : id;
+                                            return (
+                                                <div key={id} class="detail-table-row">
+                                                    <span class="font-bold">{name}</span>
+                                                    <span>{pct.fabricante}% / {pct.panadero}% / {pct.estandar}%</span>
+                                                    <button type="button" class="btn btn-danger btn-sm" onClick={() => handleRemoveIngredient(id)}>Quitar</button>
+                                                </div>
+                                            );
+                                        })
+                                    )}
+
+                                    {/* Ingredient add form */}
+                                    <div class="p-3" style={{ backgroundColor: 'var(--bg-color)', borderTop: '1px solid var(--border)' }}>
+                                        <label style={{ fontSize: '0.75rem', marginBottom: '4px', display: 'block' }}>Añadir Insumo a la Fórmula:</label>
+                                        <div class="grid-3" style={{ gap: '10px' }}>
+                                            <select value={selectedInsumoId} onChange={(e) => setSelectedInsumoId(e.target.value)} style={{ padding: '6px' }}>
+                                                <option value="">-- Elegir Insumo --</option>
+                                                {insumos
+                                                    .filter(ins => !recipeIngs[ins.id])
+                                                    .map(ins => (
+                                                        <option key={ins.id} value={ins.id}>{ins.nombre} ({ins.unidad})</option>
+                                                    ))
+                                                }
+                                            </select>
+                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                <input type="number" step="0.1" value={ingPctFabricante} onChange={(e) => setIngPctFabricante(e.target.value)} placeholder="% Fab" style={{ padding: '6px' }} />
+                                                <input type="number" step="0.1" value={ingPctPanadero} onChange={(e) => setIngPctPanadero(e.target.value)} placeholder="% Pan" style={{ padding: '6px' }} />
+                                                <input type="number" step="0.1" value={ingPctEstandar} onChange={(e) => setIngPctEstandar(e.target.value)} placeholder="% Est" style={{ padding: '6px' }} />
+                                            </div>
+                                            <button type="button" class="btn btn-secondary btn-sm" onClick={handleAddIngredient}>Añadir</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mt-2">
+                                    <label class="checkbox-container">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={esActiva} 
+                                            onChange={(e) => setEsActiva(e.target.checked)}
+                                        />
+                                        <span class="checkmark"></span>
+                                        Receta Activa (Previene eliminación por seguridad)
+                                    </label>
+                                </div>
+
+                                <div class="form-row mt-4">
+                                    <button type="submit" class="btn btn-primary">{editingId ? 'Actualizar Receta' : 'Guardar Receta'}</button>
+                                    <button type="button" class="btn btn-outline" onClick={resetForm}>Limpiar / Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* List Card */}
+                        <div class="glass-panel" style={{ gridColumn: 'span 2' }}>
+                            <h3 class="mb-4 font-bold">Fórmulas Registradas ({recetas.length})</h3>
+                            {recetas.length === 0 ? (
+                                <p class="text-muted text-center py-6">No hay recetas registradas.</p>
+                            ) : (
+                                <div class="table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Receta</th>
+                                                <th>Batido Base</th>
+                                                <th>Temporada</th>
+                                                <th>Carro / Band</th>
+                                                <th>Estado</th>
+                                                <th class="text-right">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {recetas.map(rec => {
+                                                const bat = batidosBase.find(b => b.id === rec.batidoBaseId);
+                                                return (
+                                                    <tr key={rec.id}>
+                                                        <td class="font-bold">{rec.nombre}</td>
+                                                        <td>{bat ? bat.nombre : 'No vinculado'}</td>
+                                                        <td>
+                                                            <span class={`badge ${rec.temporada === 'verano' ? 'badge-warning' : 'badge-primary'}`}>
+                                                                {rec.temporada}
+                                                            </span>
+                                                        </td>
+                                                        <td>{rec.bandejasPorCarro}c / {rec.unidadesPorBandeja}u ({getRendimientoCarro(rec)} U)</td>
+                                                        <td>
+                                                            <span class={`badge ${rec.esActiva ? 'badge-success' : 'badge-danger'}`}>
+                                                                {rec.esActiva ? 'Activa' : 'Inactiva'}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <button class="btn btn-secondary btn-sm" onClick={() => handleEdit(rec)} style={{ marginRight: '6px' }}>Editar</button>
+                                                            <button 
+                                                                class="btn btn-danger btn-sm" 
+                                                                onClick={() => handleDelete(rec.id, rec.nombre, rec.esActiva)}
+                                                                disabled={rec.esActiva}
+                                                                title={rec.esActiva ? 'No se puede eliminar una receta activa' : ''}
+                                                            >
+                                                                Eliminar
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 5. CALCULADORA VERSÁTIL (MOTOR CENTRAL) VIEW
+        // ==========================================
+        function CalculadoraView({ recetas, insumos, batidosBase, preset, clearPreset, onSendToRegister }) {
+            const [receta1Id, setReceta1Id] = useState('');
+            const [pctType1, setPctType1] = useState('panadero');
+            const [calcMode1, setCalcMode1] = useState('ingrediente');
+
+            const [pivot1Id, setPivot1Id] = useState('');
+            const [pivot1Weight, setPivot1Weight] = useState('');
+            const [pivot1Unit, setPivot1Unit] = useState('Gr');
+
+            const [qtyBandejas1, setQtyBandejas1] = useState('');
+            const [qtyUnidades1, setQtyUnidades1] = useState('');
+
+            const [combinar, setCombinar] = useState(false);
+
+            const [receta2Id, setReceta2Id] = useState('');
+            const [pctType2, setPctType2] = useState('panadero');
+            const [calcMode2, setCalcMode2] = useState('ingrediente');
+
+            const [pivot2Id, setPivot2Id] = useState('');
+            const [pivot2Weight, setPivot2Weight] = useState('');
+            const [pivot2Unit, setPivot2Unit] = useState('Gr');
+
+            const [qtyBandejas2, setQtyBandejas2] = useState('');
+            const [qtyUnidades2, setQtyUnidades2] = useState('');
+
+            useEffect(() => {
+                if (preset) {
+                    setReceta1Id(preset);
+                    const rec = recetas.find(r => r.id === preset);
+                    if (rec) {
+                        setPctType1(rec.tipoPorcentaje);
+                        const keys = Object.keys(rec.porcentajes);
+                        if (keys.length > 0) {
+                            setPivot1Id(keys[0]);
+                        }
+                    }
+                    clearPreset();
+                }
+            }, [preset]);
+
+            useEffect(() => {
+                const rec = recetas.find(r => r.id === receta1Id);
+                if (rec) {
+                    setPctType1(rec.tipoPorcentaje);
+                    const keys = Object.keys(rec.porcentajes);
+                    if (keys.length > 0) {
+                        setPivot1Id(keys[0]);
+                    }
+                }
+            }, [receta1Id]);
+
+            useEffect(() => {
+                const rec = recetas.find(r => r.id === receta2Id);
+                if (rec) {
+                    setPctType2(rec.tipoPorcentaje);
+                    const keys = Object.keys(rec.porcentajes);
+                    if (keys.length > 0) {
+                        setPivot2Id(keys[0]);
+                    }
+                }
+            }, [receta2Id]);
+
+            const rec1 = useMemo(() => recetas.find(r => r.id === receta1Id), [recetas, receta1Id]);
+            const rec2 = useMemo(() => recetas.find(r => r.id === receta2Id), [recetas, receta2Id]);
+
+            const batidoBaseCompatible = useMemo(() => {
+                if (!combinar || !rec1 || !rec2) return true;
+                return rec1.batidoBaseId === rec2.batidoBaseId;
+            }, [combinar, rec1, rec2]);
+
+            const calculateRecipe = (receta, pctType, calcMode, pivotId, pivotWeight, pivotUnit, qtyBandejas, qtyUnidades) => {
+                if (!receta) return null;
+
+                let flourWeightG = 0;
+                let totalDoughG = 0;
+                let units = 0;
+                let trays = 0;
+                let carriages = 0;
+
+                let sumPercentages = 0;
+                const ingredientPcts = {};
+                Object.entries(receta.porcentajes).forEach(([id, pct]) => {
+                    const val = pct[pctType] || 0;
+                    ingredientPcts[id] = val;
+                    sumPercentages += val;
+                });
+
+                if (calcMode === 'ingrediente') {
+                    const weightVal = parseFloat(pivotWeight) || 0;
+                    if (weightVal <= 0) return null;
+
+                    const weightG = pivotUnit === 'Kg' || pivotUnit === 'Ltr' ? weightVal * 1000 : weightVal;
+                    const pivotPct = ingredientPcts[pivotId] || 100;
+                    
+                    const factor = weightG / pivotPct;
+                    flourWeightG = factor * 100;
+                    totalDoughG = factor * sumPercentages;
+
+                    units = totalDoughG / receta.pesoUnidad;
+                    trays = units / receta.unidadesPorBandeja;
+                    carriages = trays / receta.bandejasPorCarro;
+                } else if (calcMode === 'bandejas') {
+                    const traysVal = parseFloat(qtyBandejas) || 0;
+                    if (traysVal <= 0) return null;
+
+                    trays = traysVal;
+                    units = trays * receta.unidadesPorBandeja;
+                    totalDoughG = units * receta.pesoUnidad;
+                    
+                    const factor = totalDoughG / sumPercentages;
+                    flourWeightG = factor * 100;
+                    carriages = trays / receta.bandejasPorCarro;
+                } else if (calcMode === 'unidades') {
+                    const unitsVal = parseFloat(qtyUnidades) || 0;
+                    if (unitsVal <= 0) return null;
+
+                    units = unitsVal;
+                    totalDoughG = units * receta.pesoUnidad;
+                    
+                    const factor = totalDoughG / sumPercentages;
+                    flourWeightG = factor * 100;
+                    trays = units / receta.unidadesPorBandeja;
+                    carriages = trays / receta.bandejasPorCarro;
+                }
+
+                const ingredientsCalculated = {};
+                Object.entries(ingredientPcts).forEach(([id, pct]) => {
+                    const factor = flourWeightG / 100;
+                    ingredientsCalculated[id] = factor * pct;
+                });
+
+                return {
+                    recetaId: receta.id,
+                    recetaNombre: receta.nombre,
+                    flourWeightG,
+                    totalDoughG,
+                    units,
+                    trays,
+                    carriages,
+                    ingredients: ingredientsCalculated
+                };
+            };
+
+            const result1 = useMemo(() => {
+                return calculateRecipe(rec1, pctType1, calcMode1, pivot1Id, pivot1Weight, pivot1Unit, qtyBandejas1, qtyUnidades1);
+            }, [rec1, pctType1, calcMode1, pivot1Id, pivot1Weight, pivot1Unit, qtyBandejas1, qtyUnidades1]);
+
+            const result2 = useMemo(() => {
+                if (!combinar) return null;
+                return calculateRecipe(rec2, pctType2, calcMode2, pivot2Id, pivot2Weight, pivot2Unit, qtyBandejas2, qtyUnidades2);
+            }, [combinar, rec2, pctType2, calcMode2, pivot2Id, pivot2Weight, pivot2Unit, qtyBandejas2, qtyUnidades2]);
+
+            const combinedResults = useMemo(() => {
+                if (!result1) return null;
+                if (combinar && (!result2 || !batidoBaseCompatible)) return null;
+
+                const combinedIngs = {};
+                const addIngredients = (result) => {
+                    Object.entries(result.ingredients).forEach(([id, weightG]) => {
+                        combinedIngs[id] = (combinedIngs[id] || 0) + weightG;
+                    });
+                };
+
+                addIngredients(result1);
+                if (result2) {
+                    addIngredients(result2);
+                }
+
+                const totalDoughG = result1.totalDoughG + (result2 ? result2.totalDoughG : 0);
+                const totalFlourG = result1.flourWeightG + (result2 ? result2.flourWeightG : 0);
+
+                let totalDryG = 0;
+                Object.entries(combinedIngs).forEach(([id, weightG]) => {
+                    const ins = insumos.find(i => i.id === id);
+                    if (ins && !esInsumoLiquido(ins.nombre, ins.unidad)) {
+                        totalDryG += weightG;
+                    }
+                });
+
+                const totalCarriages = result1.carriages + (result2 ? result2.carriages : 0);
+                const totalTrays = result1.trays + (result2 ? result2.trays : 0);
+                const totalUnits = result1.units + (result2 ? result2.units : 0);
+
+                const activeBatId = rec1.batidoBaseId;
+                const activeBat = batidosBase.find(b => b.id === activeBatId);
+                let batidosCount = 0;
+                let extraMasaG = 0;
+                const extraIngredients = {};
+
+                if (activeBat && activeBat.totalMasaTeorica > 0) {
+                    const teóricaMasa = activeBat.totalMasaTeorica;
+                    batidosCount = Math.floor(totalDoughG / teóricaMasa);
+                    extraMasaG = totalDoughG % teóricaMasa;
+
+                    if (extraMasaG > 0) {
+                        const ratio = extraMasaG / totalDoughG;
+                        
+                        Object.entries(result1.ingredients).forEach(([id, weightG]) => {
+                            extraIngredients[id] = (extraIngredients[id] || 0) + (weightG * ratio);
+                        });
+
+                        if (result2) {
+                            Object.entries(result2.ingredients).forEach(([id, weightG]) => {
+                                extraIngredients[id] = (extraIngredients[id] || 0) + (weightG * ratio);
+                            });
+                        }
+                    }
+                }
+
+                return {
+                    ingredients: combinedIngs,
+                    totalDoughG,
+                    totalFlourG,
+                    totalDryG,
+                    totalCarriages,
+                    totalTrays,
+                    totalUnits,
+                    batidosCount,
+                    extraMasaG,
+                    extraIngredients,
+                    batidoBaseName: activeBat ? activeBat.nombre : 'No asignado',
+                    batidoBaseMasaTeorica: activeBat ? activeBat.totalMasaTeorica : 0
+                };
+            }, [result1, result2, combinar, batidoBaseCompatible, insumos, batidosBase, rec1]);
+
+            const handleSendToRegisterLocal = () => {
+                if (!combinedResults) return;
+
+                const batidoBaseId = rec1.batidoBaseId;
+                const nameBase = combinedResults.batidoBaseName;
+                
+                const listPct = Object.entries(combinedResults.ingredients).map(([id, weightG]) => {
+                    const ins = insumos.find(i => i.id === id);
+                    const name = ins ? ins.nombre : 'Insumo';
+                    const pctVal = (weightG / combinedResults.totalFlourG) * 100;
+                    return {
+                        nombreInsumo: name,
+                        porcentaje: pctVal,
+                        pesoG: weightG
+                    };
+                });
+
+                onSendToRegister({
+                    batidoBaseId,
+                    nombreBatidoBase: nameBase,
+                    pesoTeorico: combinedResults.totalDoughG,
+                    porcentajesUsados: listPct
+                });
+            };
+
+            return (
+                <div>
+                    <h2 class="view-title">🧮 Calculadora Versátil</h2>
+                    <p class="view-subtitle">Escala tus fórmulas con el motor central de porcentaje panadero e ingrediente 100% pivot.</p>
+
+                    <div class="grid-2">
+                        {/* Parameter inputs */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            {/* RECETA 1 PANEL */}
+                            <div class="glass-panel" style={{ marginBottom: 0 }}>
+                                <h3 class="mb-4 font-bold text-primary">Receta Base #1</h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Seleccionar Receta</label>
+                                        <select value={receta1Id} onChange={(e) => setReceta1Id(e.target.value)}>
+                                            <option value="">-- Seleccionar Receta --</option>
+                                            {recetas.filter(r => r.esActiva).map(r => (
+                                                <option key={r.id} value={r.id}>{r.nombre}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Porcentaje de Trabajo</label>
+                                        <select value={pctType1} onChange={(e) => setPctType1(e.target.value)} disabled={!rec1}>
+                                            <option value="fabricante">Fabricante</option>
+                                            <option value="panadero">Panadero</option>
+                                            <option value="estandar">Estándar Empresa</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {rec1 && (
+                                    <div class="form-group">
+                                        <label>Método de Entrada</label>
+                                        <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                                            <button 
+                                                type="button" 
+                                                class={`btn btn-sm ${calcMode1 === 'ingrediente' ? 'btn-primary' : 'btn-outline'}`}
+                                                onClick={() => setCalcMode1('ingrediente')}
+                                            >
+                                                Ingrediente 100%
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                class={`btn btn-sm ${calcMode1 === 'bandejas' ? 'btn-primary' : 'btn-outline'}`}
+                                                onClick={() => setCalcMode1('bandejas')}
+                                            >
+                                                Por Bandejas
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                class={`btn btn-sm ${calcMode1 === 'unidades' ? 'btn-primary' : 'btn-outline'}`}
+                                                onClick={() => setCalcMode1('unidades')}
+                                            >
+                                                Por Unidades
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {rec1 && calcMode1 === 'ingrediente' && (
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Ingrediente Pivot 100%</label>
+                                            <select value={pivot1Id} onChange={(e) => setPivot1Id(e.target.value)}>
+                                                {Object.keys(rec1.porcentajes).map(id => {
+                                                    const ins = insumos.find(i => i.id === id);
+                                                    const name = ins ? ins.nombre : id;
+                                                    return (
+                                                        <option key={id} value={id}>{name}</option>
+                                                    );
+                                                })}
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Peso Deseado</label>
+                                            <div style={{ display: 'flex', gap: '6px' }}>
+                                                <input type="number" step="0.01" value={pivot1Weight} onChange={(e) => setPivot1Weight(e.target.value)} placeholder="Ej. 150" />
+                                                <select value={pivot1Unit} onChange={(e) => setPivot1Unit(e.target.value)} style={{ width: '80px', flexShrink: 0 }}>
+                                                    <option value="Gr">Gr</option>
+                                                    <option value="Kg">Kg</option>
+                                                    <option value="Ltr">Ltr</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {rec1 && calcMode1 === 'bandejas' && (
+                                    <div class="form-group">
+                                        <label>Cantidad de Bandejas</label>
+                                        <input type="number" value={qtyBandejas1} onChange={(e) => setQtyBandejas1(e.target.value)} placeholder="Ej. 9" />
+                                    </div>
+                                )}
+
+                                {rec1 && calcMode1 === 'unidades' && (
+                                    <div class="form-group">
+                                        <label>Cantidad de Unidades (Panes)</label>
+                                        <input type="number" value={qtyUnidades1} onChange={(e) => setQtyUnidades1(e.target.value)} placeholder="Ej. 288" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* COMBINE CHECKBOX */}
+                            {rec1 && (
+                                <div class="glass-panel" style={{ marginBottom: 0, padding: '16px 24px' }}>
+                                    <label class="checkbox-container">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={combinar} 
+                                            onChange={(e) => setCombinar(e.target.checked)}
+                                        />
+                                        <span class="checkmark"></span>
+                                        Combinar con otra Receta (Mismo Batido Base)
+                                    </label>
+                                </div>
+                            )}
+
+                            {/* RECETA 2 PANEL */}
+                            {combinar && rec1 && (
+                                <div class="glass-panel" style={{ marginBottom: 0 }}>
+                                    <h3 class="mb-4 font-bold text-primary">Receta Base #2</h3>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Seleccionar Receta</label>
+                                            <select value={receta2Id} onChange={(e) => setReceta2Id(e.target.value)}>
+                                                <option value="">-- Seleccionar Receta --</option>
+                                                {recetas
+                                                    .filter(r => r.esActiva && r.id !== receta1Id)
+                                                    .map(r => (
+                                                        <option key={r.id} value={r.id}>{r.nombre}</option>
+                                                    ))}
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Porcentaje de Trabajo</label>
+                                            <select value={pctType2} onChange={(e) => setPctType2(e.target.value)} disabled={!rec2}>
+                                                <option value="fabricante">Fabricante</option>
+                                                <option value="panadero">Panadero</option>
+                                                <option value="estandar">Estándar Empresa</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {rec2 && (
+                                        <div class="form-group">
+                                            <label>Método de Entrada</label>
+                                            <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                                                <button 
+                                                    type="button" 
+                                                    class={`btn btn-sm ${calcMode2 === 'ingrediente' ? 'btn-primary' : 'btn-outline'}`}
+                                                    onClick={() => setCalcMode2('ingrediente')}
+                                                >
+                                                    Ingrediente 100%
+                                                </button>
+                                                <button 
+                                                    type="button" 
+                                                    class={`btn btn-sm ${calcMode2 === 'bandejas' ? 'btn-primary' : 'btn-outline'}`}
+                                                    onClick={() => setCalcMode2('bandejas')}
+                                                >
+                                                    Por Bandejas
+                                                </button>
+                                                <button 
+                                                    type="button" 
+                                                    class={`btn btn-sm ${calcMode2 === 'unidades' ? 'btn-primary' : 'btn-outline'}`}
+                                                    onClick={() => setCalcMode2('unidades')}
+                                                >
+                                                    Por Unidades
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {rec2 && calcMode2 === 'ingrediente' && (
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>Ingrediente Pivot 100%</label>
+                                                <select value={pivot2Id} onChange={(e) => setPivot2Id(e.target.value)}>
+                                                    {Object.keys(rec2.porcentajes).map(id => {
+                                                        const ins = insumos.find(i => i.id === id);
+                                                        const name = ins ? ins.nombre : id;
+                                                        return (
+                                                            <option key={id} value={id}>{name}</option>
+                                                        );
+                                                    })}
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Peso Deseado</label>
+                                                <div style={{ display: 'flex', gap: '6px' }}>
+                                                    <input type="number" step="0.01" value={pivot2Weight} onChange={(e) => setPivot2Weight(e.target.value)} placeholder="Ej. 150" />
+                                                    <select value={pivot2Unit} onChange={(e) => setPivot2Unit(e.target.value)} style={{ width: '80px', flexShrink: 0 }}>
+                                                        <option value="Gr">Gr</option>
+                                                        <option value="Kg">Kg</option>
+                                                        <option value="Ltr">Ltr</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {rec2 && calcMode2 === 'bandejas' && (
+                                        <div class="form-group">
+                                            <label>Cantidad de Bandejas</label>
+                                            <input type="number" value={qtyBandejas2} onChange={(e) => setQtyBandejas2(e.target.value)} placeholder="Ej. 9" />
+                                        </div>
+                                    )}
+
+                                    {rec2 && calcMode2 === 'unidades' && (
+                                        <div class="form-group">
+                                            <label>Cantidad de Unidades (Panes)</label>
+                                            <input type="number" value={qtyUnidades2} onChange={(e) => setQtyUnidades2(e.target.value)} placeholder="Ej. 288" />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Calculations output Results */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            {!batidoBaseCompatible && (
+                                <div class="alert-block alert-danger">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                                    </svg>
+                                    <div>
+                                        <strong class="font-bold block">Incompatibilidad de Batido Base</strong>
+                                        Las recetas seleccionadas no comparten el mismo batido base. Solo se permite combinar recetas con el mismo batido base para asegurar una sola amasada consistente.
+                                    </div>
+                                </div>
+                            )}
+
+                            {combinedResults ? (
+                                <div class="glass-panel">
+                                    <h3 class="mb-4 font-bold border-b pb-2">Resultados del Escalado</h3>
+
+                                    {/* Consolidated summary weights */}
+                                    <div class="grid-2 mb-4">
+                                        <div class="p-3" style={{ backgroundColor: 'var(--primary-light)', borderRadius: 'var(--radius-md)' }}>
+                                            <span class="badge badge-primary">Masa Total Masa</span>
+                                            <h4 class="font-bold text-primary" style={{ fontSize: '1.4rem', marginTop: '4px' }}>
+                                                {(combinedResults.totalDoughG / 1000).toFixed(3)} Kg
+                                            </h4>
+                                        </div>
+                                        <div class="p-3" style={{ backgroundColor: 'var(--bg-color)', borderRadius: 'var(--radius-md)' }}>
+                                            <span class="badge badge-success">Mezcla Seca Total</span>
+                                            <h4 class="font-bold text-success" style={{ fontSize: '1.4rem', marginTop: '4px' }}>
+                                                {(combinedResults.totalDryG / 1000).toFixed(3)} Kg
+                                            </h4>
+                                        </div>
+                                    </div>
+
+                                    {/* Yield Summary */}
+                                    <div class="detail-table-card mb-4">
+                                        <div class="detail-table-header">Resumen de Rendimiento</div>
+                                        <div class="detail-table-row">
+                                            <span>Carros Totales:</span>
+                                            <span class="font-bold">{combinedResults.totalCarriages.toFixed(2)}</span>
+                                        </div>
+                                        <div class="detail-table-row">
+                                            <span>Bandejas Totales:</span>
+                                            <span class="font-bold">{combinedResults.totalTrays.toFixed(2)}</span>
+                                        </div>
+                                        <div class="detail-table-row">
+                                            <span>Unidades Totales (Panes):</span>
+                                            <span class="font-bold">{Math.floor(combinedResults.totalUnits)} uds</span>
+                                        </div>
+                                    </div>
+
+                                    {/* General Ingredients list */}
+                                    <div class="detail-table-card mb-4">
+                                        <div class="detail-table-header">Ingredientes Acumulados a Usar</div>
+                                        {Object.entries(combinedResults.ingredients).map(([id, weightG]) => {
+                                            const ins = insumos.find(i => i.id === id);
+                                            const name = ins ? ins.nombre : id;
+                                            const unit = ins ? ins.unidad : 'Gr';
+                                            
+                                            let displayWeight = '';
+                                            if (unit === 'Kg' || unit === 'Ltr') {
+                                                displayWeight = `${(weightG / 1000).toFixed(3)} ${unit}`;
+                                            } else {
+                                                displayWeight = weightG >= 1000 ? `${(weightG / 1000).toFixed(3)} Kg` : `${weightG.toFixed(1)} Gr`;
+                                            }
+
+                                            return (
+                                                <div key={id} class="detail-table-row">
+                                                    <span class="font-bold">{name}</span>
+                                                    <span class="text-primary font-bold">{displayWeight}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {/* Batido Base and Extra calculations */}
+                                    {combinedResults.batidoBaseMasaTeorica > 0 && (
+                                        <div class="glass-panel" style={{ backgroundColor: 'var(--bg-color)', border: '1px dashed var(--primary)', padding: '16px' }}>
+                                            <h4 class="font-bold text-primary mb-2" style={{ fontSize: '0.95rem' }}>🥣 Planificación de Batidos</h4>
+                                            <p class="text-muted" style={{ fontSize: '0.85rem', marginBottom: '8px' }}>
+                                                Batido Base: **{combinedResults.batidoBaseName}** (Capacidad teórica: {(combinedResults.batidoBaseMasaTeorica / 1000).toFixed(1)} Kg por batido).
+                                            </p>
+                                            <div class="flex-between font-bold mb-2" style={{ fontSize: '0.9rem' }}>
+                                                <span>Batidos Enteros Necesarios:</span>
+                                                <span class="text-primary" style={{ fontSize: '1.1rem' }}>{combinedResults.batidosCount}</span>
+                                            </div>
+
+                                            {combinedResults.extraMasaG > 0 && (
+                                                <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+                                                    <div class="flex-between font-bold mb-2" style={{ fontSize: '0.85rem', color: 'var(--warning)' }}>
+                                                        <span>⚠️ Preparado Extra Requerido:</span>
+                                                        <span>{(combinedResults.extraMasaG / 1000).toFixed(3)} Kg</span>
+                                                    </div>
+                                                    <div class="detail-table-card" style={{ fontSize: '0.8rem' }}>
+                                                        <div class="detail-table-header" style={{ backgroundColor: 'var(--warning-light)', color: 'var(--warning)' }}>Ingredientes del Extra</div>
+                                                        {Object.entries(combinedResults.extraIngredients).map(([id, weightG]) => {
+                                                            const ins = insumos.find(i => i.id === id);
+                                                            const name = ins ? ins.nombre : id;
+                                                            const unit = ins ? ins.unidad : 'Gr';
+                                                            
+                                                            let displayWeight = '';
+                                                            if (unit === 'Kg' || unit === 'Ltr') {
+                                                                displayWeight = `${(weightG / 1000).toFixed(3)} ${unit}`;
+                                                            } else {
+                                                                displayWeight = weightG >= 1000 ? `${(weightG / 1000).toFixed(3)} Kg` : `${weightG.toFixed(1)} Gr`;
+                                                            }
+
+                                                            return (
+                                                                <div key={id} class="detail-table-row" style={{ padding: '8px 12px' }}>
+                                                                    <span>{name}</span>
+                                                                    <span class="font-bold">{displayWeight}</span>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    <button class="btn btn-primary btn-block mt-4" onClick={handleSendToRegisterLocal}>
+                                        📋 Guardar y Registrar Producción de Batido
+                                    </button>
+                                </div>
+                            ) : (
+                                <div class="glass-panel text-center text-muted py-16">
+                                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-4" style={{ margin: '0 auto 16px', color: 'var(--border)' }}>
+                                        <rect x="4" y="4" width="16" height="16" rx="2"/>
+                                        <line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/>
+                                    </svg>
+                                    <p>Selecciona la receta e ingresa los pesos, bandejas o unidades para ver los resultados calculados.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 6. REGISTRO DE BATIDO (CON MERMA) VIEW
+        // ==========================================
+        function RegistrarBatidoView({ batidosBase, recetas, insumos, preset, clearPreset, onSave }) {
+            const [batidoBaseId, setBatidoBaseId] = useState('');
+            const [pesoTeorico, setPesoTeorico] = useState('');
+            const [pesoReal, setPesoReal] = useState('');
+            const [nota, setNota] = useState('');
+            const [porcentajesUsados, setPorcentajesUsados] = useState([]);
+
+            useEffect(() => {
+                if (preset) {
+                    setBatidoBaseId(preset.batidoBaseId);
+                    setPesoTeorico(preset.pesoTeorico.toString());
+                    setPorcentajesUsados(preset.porcentajesUsados);
+                    clearPreset();
+                }
+            }, [preset]);
+
+            const selectedBat = useMemo(() => {
+                return batidosBase.find(b => b.id === batidoBaseId);
+            }, [batidosBase, batidoBaseId]);
+
+            const mermaCalculated = useMemo(() => {
+                const teo = parseFloat(pesoTeorico) || 0;
+                const real = parseFloat(pesoReal) || 0;
+                if (teo <= 0 || real <= 0) return 0;
+                return ((teo - real) / teo) * 100;
+            }, [pesoTeorico, pesoReal]);
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (!batidoBaseId) {
+                    alert('Por favor selecciona un Batido Base.');
+                    return;
+                }
+                const teo = parseFloat(pesoTeorico) || 0;
+                const real = parseFloat(pesoReal) || 0;
+
+                if (teo <= 0 || real <= 0) {
+                    alert('El peso teórico y el peso real obtenido deben ser mayores a 0.');
+                    return;
+                }
+
+                let finalPcts = porcentajesUsados;
+                if (finalPcts.length === 0) {
+                    const matchingRecipe = recetas.find(r => r.batidoBaseId === batidoBaseId);
+                    if (matchingRecipe) {
+                        finalPcts = Object.entries(matchingRecipe.porcentajes).map(([insId, p]) => {
+                            const ins = insumos.find(i => i.id === insId);
+                            const name = ins ? ins.nombre : 'Insumo';
+                            const pctVal = p.panadero || p.fabricante || 0;
+                            return {
+                                nombreInsumo: name,
+                                porcentaje: pctVal,
+                                pesoG: (teo * pctVal) / 100
+                            };
+                        });
+                    }
+                }
+
+                const now = new Date();
+                const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                
+                const fechaLegible = `${days[now.getDay()]} ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()} a las ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+                const newRecord = {
+                    id: 'h_' + Date.now(),
+                    batidoBaseId,
+                    nombreBatidoBase: selectedBat ? selectedBat.nombre : 'Batido',
+                    fechaHora: fechaLegible,
+                    porcentajesUsados: finalPcts,
+                    pesoTeorico: teo,
+                    pesoReal: real,
+                    merma: mermaCalculated,
+                    nota: nota.trim()
+                };
+
+                onSave(newRecord);
+                alert('Batido registrado en el historial correctamente.');
+                
+                setBatidoBaseId('');
+                setPesoTeorico('');
+                setPesoReal('');
+                setNota('');
+                setPorcentajesUsados([]);
+            };
+
+            return (
+                <div>
+                    <h2 class="view-title">Registrar Batido</h2>
+                    <p class="view-subtitle">Guarda el registro de producción y calcula la merma (comparación teórico vs real obtenidos).</p>
+
+                    <div class="grid-2">
+                        {/* Form Card */}
+                        <div class="glass-panel">
+                            <h3 class="mb-4 font-bold">Ficha de Registro</h3>
+                            <form onSubmit={handleSubmit}>
+                                <div class="form-group">
+                                    <label>Seleccionar Batido Base</label>
+                                    <select value={batidoBaseId} onChange={(e) => setBatidoBaseId(e.target.value)}>
+                                        <option value="">-- Seleccionar Batido --</option>
+                                        {batidosBase.map(b => (
+                                            <option key={b.id} value={b.id}>{b.nombre} (Teórica: {(b.totalMasaTeorica / 1000).toFixed(1)} Kg)</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Peso Teórico de la Masa (Gr)</label>
+                                        <input 
+                                            type="number" 
+                                            value={pesoTeorico} 
+                                            onChange={(e) => setPesoTeorico(e.target.value)} 
+                                            placeholder="Ej. 25000"
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Peso Real Obtenido (Gr)</label>
+                                        <input 
+                                            type="number" 
+                                            value={pesoReal} 
+                                            onChange={(e) => setPesoReal(e.target.value)} 
+                                            placeholder="Ej. 24600"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Nota / Comentario del Batido</label>
+                                    <textarea 
+                                        value={nota} 
+                                        onChange={(e) => setNota(e.target.value)} 
+                                        placeholder="Ej. Masa ligeramente húmeda, temperatura del agua de 15°C..."
+                                    />
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block">Confirmar y Archivar Registro</button>
+                            </form>
+                        </div>
+
+                        {/* Merma and comparison panel */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <div class="glass-panel">
+                                <h3 class="mb-4 font-bold border-b pb-2">Cálculo de Merma</h3>
+                                
+                                <div class="detail-table-card mb-4">
+                                    <div class="detail-table-row">
+                                        <span>Peso Teórico Esperado:</span>
+                                        <span class="font-bold">
+                                            {pesoTeorico ? `${(parseFloat(pesoTeorico) / 1000).toFixed(3)} Kg` : '0.000 Kg'}
+                                        </span>
+                                    </div>
+                                    <div class="detail-table-row">
+                                        <span>Peso Real Pesado:</span>
+                                        <span class="font-bold text-primary">
+                                            {pesoReal ? `${(parseFloat(pesoReal) / 1000).toFixed(3)} Kg` : '0.000 Kg'}
+                                        </span>
+                                    </div>
+                                    <div class="detail-table-row">
+                                        <span>Diferencia de Masa:</span>
+                                        <span class="font-bold text-danger">
+                                            {pesoTeorico && pesoReal ? `${((parseFloat(pesoTeorico) - parseFloat(pesoReal)) / 1000).toFixed(3)} Kg` : '0.000 Kg'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {pesoTeorico && pesoReal && parseFloat(pesoTeorico) > 0 && parseFloat(pesoReal) > 0 ? (
+                                    <div class="p-4 text-center" style={{ borderRadius: 'var(--radius-md)', backgroundColor: mermaCalculated > 0 ? 'var(--danger-light)' : 'var(--success-light)', border: '1px solid' }}>
+                                        <span class="badge" style={{ backgroundColor: mermaCalculated > 0 ? 'var(--danger)' : 'var(--success)', color: 'white', fontSize: '0.8rem', padding: '4px 12px' }}>
+                                            Merma de Proceso: {mermaCalculated.toFixed(2)}%
+                                        </span>
+                                        <p class="mt-4" style={{ fontSize: '0.85rem', color: 'var(--text-color)' }}>
+                                            {mermaCalculated > 0 
+                                                ? `Se ha perdido un total de ${(parseFloat(pesoTeorico) - parseFloat(pesoReal)).toFixed(0)} gramos de masa por evaporación, restos en amasadora u otros factores.`
+                                                : `¡Masa excedente! Obtuviste un aumento de masa de ${Math.abs(parseFloat(pesoTeorico) - parseFloat(pesoReal)).toFixed(0)} gramos comparada con la receta estándar.`
+                                            }
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <p class="text-muted text-center py-6">Rellene los pesos de la ficha de registro para visualizar la merma del proceso.</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 7. HISTORIAL VIEW
+        // ==========================================
+        function HistorialView({ historial, setHistorial }) {
+            const [selectedRecord, setSelectedRecord] = useState(null);
+
+            const handleDelete = (id, date) => {
+                if (window.confirm(`¿Estás seguro de que deseas eliminar permanentemente el registro de batido del día ${date}?`)) {
+                    setHistorial(prev => prev.filter(h => h.id !== id));
+                    if (selectedRecord && selectedRecord.id === id) {
+                        setSelectedRecord(null);
+                    }
+                }
+            };
+
+            return (
+                <div>
+                    <h2 class="view-title">Historial de Batidos</h2>
+                    <p class="view-subtitle">Consulta producciones anteriores y evalúa los niveles de merma histórica.</p>
+
+                    <div class="grid-2">
+                        {/* List block */}
+                        <div class="glass-panel">
+                            <h3 class="mb-4 font-bold">Jornadas Registradas ({historial.length})</h3>
+                            {historial.length === 0 ? (
+                                <p class="text-muted text-center py-6">No hay registros en el historial de producciones.</p>
+                            ) : (
+                                <div class="table-responsive" style={{ maxHeight: '500px' }}>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha / Hora</th>
+                                                <th>Batido Base</th>
+                                                <th>Merma (%)</th>
+                                                <th class="text-right">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {historial.map(h => (
+                                                <tr 
+                                                    key={h.id} 
+                                                    style={{ cursor: 'pointer', backgroundColor: selectedRecord?.id === h.id ? 'var(--primary-light)' : '' }}
+                                                    onClick={() => setSelectedRecord(h)}
+                                                >
+                                                    <td class="font-bold">{h.fechaHora.split(' a las ')[0]}</td>
+                                                    <td>{h.nombreBatidoBase}</td>
+                                                    <td>
+                                                        <span class={`badge ${h.merma > 3 ? 'badge-danger' : h.merma > 0 ? 'badge-warning' : 'badge-success'}`}>
+                                                            {h.merma.toFixed(1)}%
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-right" onClick={(e) => e.stopPropagation()}>
+                                                        <button class="btn btn-danger btn-sm" onClick={() => handleDelete(h.id, h.fechaHora)}>Eliminar</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Details Block */}
+                        <div class="glass-panel">
+                            <h3 class="mb-4 font-bold border-b pb-2">Detalles del Batido</h3>
+                            
+                            {selectedRecord ? (
+                                <div>
+                                    <div class="mb-4">
+                                        <span class="badge badge-primary">{selectedRecord.nombreBatidoBase}</span>
+                                        <p class="font-bold mt-2" style={{ fontSize: '0.9rem' }}>Registrado el: {selectedRecord.fechaHora}</p>
+                                    </div>
+
+                                    <div class="detail-table-card mb-4">
+                                        <div class="detail-table-header">Consolidado de Masa</div>
+                                        <div class="detail-table-row">
+                                            <span>Masa Teórica Calculada:</span>
+                                            <span class="font-bold">{(selectedRecord.pesoTeorico / 1000).toFixed(3)} Kg</span>
+                                        </div>
+                                        <div class="detail-table-row">
+                                            <span>Masa Real Obtenida:</span>
+                                            <span class="font-bold">{(selectedRecord.pesoReal / 1000).toFixed(3)} Kg</span>
+                                        </div>
+                                        <div class="detail-table-row" style={{ color: selectedRecord.merma > 0 ? 'var(--danger)' : 'var(--success)' }}>
+                                            <span>Porcentaje Merma:</span>
+                                            <span class="font-bold">{selectedRecord.merma.toFixed(2)}%</span>
+                                        </div>
+                                    </div>
+
+                                    {selectedRecord.nota && (
+                                        <div class="p-3 mb-4" style={{ backgroundColor: 'var(--bg-color)', borderRadius: 'var(--radius-md)', borderLeft: '3px solid var(--primary)' }}>
+                                            <strong class="block" style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Nota extra del registro:</strong>
+                                            <p style={{ fontSize: '0.85rem', marginTop: '4px' }}>"{selectedRecord.nota}"</p>
+                                        </div>
+                                    )}
+
+                                    {selectedRecord.porcentajesUsados && selectedRecord.porcentajesUsados.length > 0 && (
+                                        <div class="detail-table-card">
+                                            <div class="detail-table-header">Insumos Utilizados en la Receta</div>
+                                            {selectedRecord.porcentajesUsados.map((ing, i) => (
+                                                <div key={i} class="detail-table-row" style={{ padding: '8px 12px', fontSize: '0.8rem' }}>
+                                                    <span>{ing.nombreInsumo}</span>
+                                                    <span>{ing.porcentaje.toFixed(1)}% ({ing.pesoG >= 1000 ? `${(ing.pesoG/1000).toFixed(3)} Kg` : `${ing.pesoG.toFixed(0)} Gr`})</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <p class="text-muted text-center py-16">Seleccione una jornada del listado de la izquierda para ver el desglose de producción.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 9. INSTRUCCIONES Y GLOSARIO VIEW
+        // ==========================================
+        function InstruccionesView() {
+            return (
+                <div>
+                    <h2 class="view-title">📖 Instrucciones y Glosario</h2>
+                    <p class="view-subtitle">Guía de usuario, abreviaturas y conceptos clave para el control de producción de tu panadería.</p>
+
+                    <div class="grid-2">
+                        {/* Guía de Secciones */}
+                        <div class="glass-panel">
+                            <h3 class="font-bold text-primary mb-4" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                💡 Guía de Uso por Sección
+                            </h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                <div style={{ borderLeft: '3px solid var(--accent)', paddingLeft: '12px' }}>
+                                    <h4 class="font-bold" style={{ fontSize: '0.95rem' }}>1. Inicio (Dashboard)</h4>
+                                    <p class="text-muted" style={{ fontSize: '0.85rem' }}>
+                                        Pantalla principal. Muestra accesos directos de gran tamaño a la **Calculadora** y al **Registro de Batidos**. Recomienda automáticamente recetas activas de la temporada actual (Invierno o Verano) según la fecha del sistema. Incluye el botón **Reinicio Total** en el pie de página para limpiar todos los datos.
+                                    </p>
+                                </div>
+                                <div style={{ borderLeft: '3px solid var(--accent)', paddingLeft: '12px' }}>
+                                    <h4 class="font-bold" style={{ fontSize: '0.95rem' }}>2. Calculadora Versátil</h4>
+                                    <p class="text-muted" style={{ fontSize: '0.85rem' }}>
+                                        El núcleo de la aplicación. Te permite escalar una receta base. Puedes ingresar los requerimientos por **Unidades**, **Bandejas** o por **Ingrediente Pivot al 100%** (por ejemplo, si tienes 10 kg de Harina o 150 gr de premezcla Pannivita). Si activas "Combinar", puedes calcular insumos conjuntos de dos recetas que compartan el mismo Batido Base, y calcular la cantidad de batidos enteros necesarios y el **Preparado Extra** faltante.
+                                    </p>
+                                </div>
+                                <div style={{ borderLeft: '3px solid var(--accent)', paddingLeft: '12px' }}>
+                                    <h4 class="font-bold" style={{ fontSize: '0.95rem' }}>3. Gestión de Insumos</h4>
+                                    <p class="text-muted" style={{ fontSize: '0.85rem' }}>
+                                        Catálogo maestro de ingredientes. Aquí registras el nombre de la materia prima, su unidad de medida por defecto (Gramos, Kilogramos o Litros) y un precio de referencia. Evita duplicados de nombres para mantener la integridad.
+                                    </p>
+                                </div>
+                                <div style={{ borderLeft: '3px solid var(--accent)', paddingLeft: '12px' }}>
+                                    <h4 class="font-bold" style={{ fontSize: '0.95rem' }}>4. Batidos Base</h4>
+                                    <p class="text-muted" style={{ fontSize: '0.85rem' }}>
+                                        Registra las masas teóricas de cada batido estándar de tu amasadora. Las fichas marcadas como **Activas** quedan bloqueadas para su eliminación por motivos de seguridad operacional.
+                                    </p>
+                                </div>
+                                <div style={{ borderLeft: '3px solid var(--accent)', paddingLeft: '12px' }}>
+                                    <h4 class="font-bold" style={{ fontSize: '0.95rem' }}>5. Módulo de Recetas</h4>
+                                    <p class="text-muted" style={{ fontSize: '0.85rem' }}>
+                                        Crea tus recetas asociándolas a un Batido Base, especificando el peso del pan, unidades por bandeja y bandejas por carro. Define los porcentajes de ingredientes para los tres perfiles de trabajo: **Fabricante**, **Panadero** y **Estándar**.
+                                    </p>
+                                </div>
+                                <div style={{ borderLeft: '3px solid var(--accent)', paddingLeft: '12px' }}>
+                                    <h4 class="font-bold" style={{ fontSize: '0.95rem' }}>6. Registrar Batido e Historial</h4>
+                                    <p class="text-muted" style={{ fontSize: '0.85rem' }}>
+                                        Al terminar una amasada, ingresa el **Peso Real Obtenido**. La aplicación calculará la merma de proceso. Toda esta información se almacena con fecha, hora, porcentajes y notas en el **Historial de Batidos** para su análisis y consulta posterior.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Glosario y Abreviaturas */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <div class="glass-panel">
+                                <h3 class="font-bold text-primary mb-4" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    📋 Glosario de Términos Panaderos
+                                </h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.85rem' }}>
+                                    <div>
+                                        <strong class="text-secondary">Porcentaje Panadero:</strong>
+                                        <p class="text-muted mt-1">
+                                            Método de formulación donde el peso de la **Harina** siempre representa el 100%. Todos los demás ingredientes (agua, sal, levadura) se expresan como un porcentaje relativo a ese peso de harina. Facilita el escalado de recetas a cualquier tamaño de producción.
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <strong class="text-secondary">Ingrediente Pivot (100% Versátil):</strong>
+                                        <p class="text-muted mt-1">
+                                            Cualquier ingrediente seleccionado en la calculadora a partir del cual se escala la fórmula completa. Si ingresas "Pannivita = 150 Gr", la calculadora determina cuánta harina y otros insumos se necesitan para mantener la proporción exacta de la receta.
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <strong class="text-secondary">Batido Base:</strong>
+                                        <p class="text-muted mt-1">
+                                            Capacidad estándar de masa (en gramos o kilogramos) que produce una tanda o ciclo de tu máquina amasadora. Sirve como unidad de medida para organizar cuántas "amasadas completas" se deben realizar en el turno.
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <strong class="text-secondary">Preparado Extra (Masa Faltante):</strong>
+                                        <p class="text-muted mt-1">
+                                            Cantidad de masa que se requiere preparar adicionalmente a los batidos base completos para cubrir con precisión la producción solicitada de carros o bandejas, evitando el exceso de merma.
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <strong class="text-secondary">Merma de Proceso:</strong>
+                                        <p class="text-muted mt-1">
+                                            Pérdida porcentual de masa durante el proceso de producción. Se calcula comparando el peso teórico esperado de la receta contra el peso real medido en la balanza tras el amasado:
+                                            <span class="block font-bold mt-1 text-center" style={{ color: 'var(--danger)' }}>
+                                                Merma = ((Peso Teórico - Peso Real) / Peso Teórico) × 100
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <strong class="text-secondary">Mezcla Seca:</strong>
+                                        <p class="text-muted mt-1">
+                                            La suma de los pesos de todos los ingredientes secos de la receta (harina, sal, azúcar, mejoradores, premezclas), excluyendo líquidos (agua, leche, jugos).
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="glass-panel">
+                                <h3 class="font-bold text-primary mb-4" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    📏 Abreviaturas Utilizadas
+                                </h3>
+                                <div class="table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Símbolo</th>
+                                                <th>Significado</th>
+                                                <th>Definición</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="font-bold">Gr</td>
+                                                <td>Gramos</td>
+                                                <td>Unidad de peso menor.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-bold">Kg</td>
+                                                <td>Kilogramos</td>
+                                                <td>Unidad de peso mayor (1000 Gr).</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-bold">Ltr</td>
+                                                <td>Litros</td>
+                                                <td>Unidad de volumen para líquidos.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-bold">Uds / u</td>
+                                                <td>Unidades</td>
+                                                <td>Cantidad individual de piezas de pan.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-bold">Band / b</td>
+                                                <td>Bandejas</td>
+                                                <td>Planchas metálicas para hornear panes.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-bold">Carr / c</td>
+                                                <td>Carros</td>
+                                                <td>Estructuras de carros con bandejas.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-bold">% Fab</td>
+                                                <td>Porcentaje Fabricante</td>
+                                                <td>Proporción sugerida por el proveedor del insumo.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-bold">% Pan</td>
+                                                <td>Porcentaje Panadero</td>
+                                                <td>Fórmula tradicional del maestro panadero.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-bold">% Est</td>
+                                                <td>Porcentaje Estándar</td>
+                                                <td>Fórmula definida por la empresa para regular la calidad.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 8. CONFIGURACIÓN VIEW
+        // ==========================================
+        function ConfiguracionView({ empresa, setEmpresa }) {
+            const [nombre, setNombre] = useState(empresa.nombre);
+            const [logo, setLogo] = useState(empresa.logo);
+
+            const handleLogoChange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setLogo(reader.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const handleSave = (e) => {
+                e.preventDefault();
+                if (!nombre.trim()) {
+                    alert('El nombre de la empresa es obligatorio.');
+                    return;
+                }
+                setEmpresa({
+                    nombre: nombre.trim(),
+                    logo
+                });
+                alert('Configuración de la empresa guardada con éxito.');
+            };
+
+            const handleRemoveLogo = () => {
+                setLogo('');
+            };
+
+            return (
+                <div>
+                    <h2 class="view-title">Configuración del Negocio</h2>
+                    <p class="view-subtitle">Personaliza la identidad visual de tu panadería en la aplicación.</p>
+
+                    <div class="grid-2">
+                        <div class="glass-panel">
+                            <h3 class="mb-4 font-bold">Datos Corporativos</h3>
+                            <form onSubmit={handleSave}>
+                                <div class="form-group">
+                                    <label>Nombre de la Empresa</label>
+                                    <input 
+                                        type="text" 
+                                        value={nombre} 
+                                        onChange={(e) => setNombre(e.target.value)} 
+                                        placeholder="Ej. Panadería La Espiga Dorada"
+                                    />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Logotipo Corporativo</label>
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        onChange={handleLogoChange}
+                                        style={{ marginBottom: '10px' }}
+                                    />
+                                    {logo && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '10px' }}>
+                                            <div style={{ width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                                                <img src={logo} alt="Previsualización" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            </div>
+                                            <button type="button" class="btn btn-danger btn-sm" onClick={handleRemoveLogo}>Eliminar Logo</button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <button type="submit" class="btn btn-primary mt-4">Guardar Cambios</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render React DOM to root
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
